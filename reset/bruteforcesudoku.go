@@ -10,31 +10,28 @@ type BruteSudokuBoard struct {
 	Decisions
 }
 
-func (s *BruteSudokuBoard) populate(initial int) {
+func (s *BruteSudokuBoard) UpdateBoard() {
+	n := s.Decisions.First()
+	for {
+		s.board[n.row][n.column] = n.value
+		n = n.Next()
+		if n == nil {
+			break
+		}
+	}
+}
 
+func (s *BruteSudokuBoard) populate(initial int) {
+	if initial < 1 || initial > 9 {
+		panic(initial)
+	}
 	for row := 0; row <= 8; row++ {
 		for column := 0; column <= 8; column++ {
-			d := &Decision{row, column, getSquare(column, row), 0, nil, nil}
+			d := &Decision{row, column, getSquare(column, row), 0, initial, nil, nil}
 			s.Decisions.Push(d)
 		}
 	}
-
-	//for row := 0; row <= 8; row++ {
-	//	for column := 0; column <= 8; column++ {
-	//		if row == 0 && column == 0 {
-	//			s.board[row][column] = initial
-	//		} else {
-	//			for i := 1; i <= 9; i++ {
-	//				if s.vHas(column, i) || s.hHas(row, i) || s.sqHas(getSquare(column,row),i){
-	//					continue
-	//				} else {
-	//					s.board[row][column] = i
-	//					break
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+	s.Decisions.First().Populate(s)
 }
 
 func getSquare(c, r int) int {
@@ -55,7 +52,8 @@ func (s BruteSudokuBoard) isComplete() bool {
 	return true
 }
 
-func (s BruteSudokuBoard) printBoard() {
+func (s *BruteSudokuBoard) printBoard() {
+
 	fmt.Println("   1 2 3 4 5 6 7 8 9")
 	for i, val := range s.board {
 		fmt.Println(i+1, val)

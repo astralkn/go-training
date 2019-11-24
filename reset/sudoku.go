@@ -7,4 +7,5 @@ type SudokuBoard interface {
 	printBoard()
 	isComplete() bool
 	populate(initial int)
+	UpdateBoard()
 }
