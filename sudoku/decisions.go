@@ -13,6 +13,7 @@ type Decision struct {
 	strVal int
 	prev   *Decision
 	next   *Decision
+	locked bool
 }
 
 func (d Decisions) First() *Decision {
@@ -37,18 +38,34 @@ func (d *Decision) Populate(b SudokuBoard) {
 	}
 	if done {
 		b.updateBoard()
-		if d.next == nil {
-			return
+		nd := d.Next()
+		for {
+			if nd == nil {
+				return
+			}
+			if nd.locked {
+				nd = nd.Next()
+			} else {
+				break
+			}
 		}
-		d.Next().Populate(b)
+		nd.Populate(b)
 	} else {
 		d.value = 0
 		d.strVal = 0
 		b.updateBoard()
-		if d.Prev() == nil {
-			return
+		nd := d.Prev()
+		for {
+			if nd == nil {
+				return
+			}
+			if nd.locked {
+				nd = nd.Prev()
+			} else {
+				break
+			}
 		}
-		d.Prev().Populate(b)
+		nd.Populate(b)
 	}
 }
 

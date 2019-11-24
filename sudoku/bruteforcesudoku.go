@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
 )
@@ -8,6 +9,37 @@ import (
 type BruteSudokuBoard struct {
 	board [9][9]int
 	Decisions
+}
+
+func (s BruteSudokuBoard) getSquare(c, r int) int {
+	row := math.Floor(float64(r) / 3)
+	col := math.Ceil(float64(c+1) / 3)
+	sq := int(row*3 + col)
+	return sq
+}
+
+func (s BruteSudokuBoard) get(h, v int) int {
+	return s.board[h][v]
+}
+
+func (s *BruteSudokuBoard) SolveGivenBoard(givenBoard [9][9]int) error {
+	for row := 0; row <= 8; row++ {
+		for column := 0; column <= 8; column++ {
+			givenValue := givenBoard[row][column]
+			if givenValue > 0 && givenValue < 10 {
+				d := &Decision{row, column, s.getSquare(column, row), givenValue, 0, nil, nil, true}
+				s.Decisions.Push(d)
+			} else if givenValue < 0 || givenValue > 9 {
+				return errors.New("given values exceed limits")
+			} else {
+				d := &Decision{row, column, s.getSquare(column, row), 0, 0, nil, nil, false}
+				s.Decisions.Push(d)
+			}
+		}
+	}
+	s.updateBoard()
+	s.SolveBoard()
+	return nil
 }
 
 func (s *BruteSudokuBoard) updateBoard() {
@@ -21,24 +53,26 @@ func (s *BruteSudokuBoard) updateBoard() {
 	}
 }
 
-func (s *BruteSudokuBoard) PopulateBoard(initial int) {
-	if initial < 1 || initial > 9 {
-		panic(initial)
+func (s *BruteSudokuBoard) SolveBoard() {
+	first := s.Decisions.First()
+	for {
+		if first.locked {
+			first = first.Next()
+		} else {
+			break
+		}
 	}
+
+	first.Populate(s)
+}
+
+func (s *BruteSudokuBoard) InitBoard() {
 	for row := 0; row <= 8; row++ {
 		for column := 0; column <= 8; column++ {
-			d := &Decision{row, column, getSquare(column, row), 0, initial, nil, nil}
+			d := &Decision{row, column, s.getSquare(column, row), 0, 0, nil, nil, false}
 			s.Decisions.Push(d)
 		}
 	}
-	s.Decisions.First().Populate(s)
-}
-
-func getSquare(c, r int) int {
-	row := math.Floor(float64(r) / 3)
-	col := math.Ceil(float64(c+1) / 3)
-	sq := int(row*3 + col)
-	return sq
 }
 
 func (s BruteSudokuBoard) isComplete() bool {
@@ -60,17 +94,13 @@ func (s *BruteSudokuBoard) PrintBoard() {
 	}
 }
 
-func get(h, v int, s BruteSudokuBoard) int {
-	return s.board[h][v]
-}
-
 func (s BruteSudokuBoard) vHas(v, has int) bool {
 	if v > 8 || v < 0 {
 		panic(v)
 	}
 	result := false
 	for i := 0; i < 9; i++ {
-		if get(i, v, s) == has {
+		if s.get(i, v) == has {
 			result = true
 		}
 	}
@@ -83,7 +113,7 @@ func (s BruteSudokuBoard) hHas(h, has int) bool {
 	}
 	result := false
 	for i := 0; i < 9; i++ {
-		if get(h, i, s) == has {
+		if s.get(h, i) == has {
 			result = true
 		}
 	}
