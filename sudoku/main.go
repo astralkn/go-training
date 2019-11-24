@@ -2,6 +2,6 @@ package main
 
 func main() {
 	s := &BruteSudokuBoard{}
-	s.populate(2)
-	s.printBoard()
+	s.PopulateBoard(2)
+	s.PrintBoard()
 }

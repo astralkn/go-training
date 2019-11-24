@@ -36,7 +36,7 @@ func (d *Decision) Populate(b SudokuBoard) {
 		}
 	}
 	if done {
-		b.UpdateBoard()
+		b.updateBoard()
 		if d.next == nil {
 			return
 		}
@@ -44,7 +44,7 @@ func (d *Decision) Populate(b SudokuBoard) {
 	} else {
 		d.value = 0
 		d.strVal = 0
-		b.UpdateBoard()
+		b.updateBoard()
 		if d.Prev() == nil {
 			return
 		}

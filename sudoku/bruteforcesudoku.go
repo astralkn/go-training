@@ -10,7 +10,7 @@ type BruteSudokuBoard struct {
 	Decisions
 }
 
-func (s *BruteSudokuBoard) UpdateBoard() {
+func (s *BruteSudokuBoard) updateBoard() {
 	n := s.Decisions.First()
 	for {
 		s.board[n.row][n.column] = n.value
@@ -21,7 +21,7 @@ func (s *BruteSudokuBoard) UpdateBoard() {
 	}
 }
 
-func (s *BruteSudokuBoard) populate(initial int) {
+func (s *BruteSudokuBoard) PopulateBoard(initial int) {
 	if initial < 1 || initial > 9 {
 		panic(initial)
 	}
@@ -52,7 +52,7 @@ func (s BruteSudokuBoard) isComplete() bool {
 	return true
 }
 
-func (s *BruteSudokuBoard) printBoard() {
+func (s *BruteSudokuBoard) PrintBoard() {
 
 	fmt.Println("   1 2 3 4 5 6 7 8 9")
 	for i, val := range s.board {
